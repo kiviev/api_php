@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Api</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">        
+
+    <!-- Custom styles for this template -->
+    <link href="assets/css/scrolling-nav.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand js-scroll-trigger" href="#page-top">Api</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="#search">Search</a>
+                    </li>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-primary text-white">
+        <div class="container text-center">
+            <h1>Welcome to Api</h1>
+        </div>
+    </header>
+
+    <section id="search">
+        <div class="container">
+            <h5>Search by color</h5>
+            <div class="row">
+                <div class="col-12">
+                    <div class="input-group">
+                        <input class="form-control border-secondary py-2" id="find" name="find" type="search">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="send" >
+                                <i class="fa fa-search"></i>
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div id="notification-bar"></div>
+                    <div id="result">
+                        <ul class="list-unstyled" id="resultul">
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+    </section>
+
+
+
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+        <div class="container">
+            <p class="m-0 text-center text-white">Copyright &copy; Your Website 2017</p>
+        </div>
+        <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom JavaScript for this theme -->
+    <script src="assets/js/scrolling-nav.js"></script>
+
+
+<script>
+    var sendButton = $('#send');
+
+    sendButton.click(function (e) {
+        $('#result').text('');
+        $('#notification-bar').text('');
+        var findInput = $('#find');
+        var value = findInput.val();
+        if(value){
+            ajax('api/search/' + value);
+        }
+
+    });
+
+    function ajax(href){
+        $.ajax(href, {
+            success: function(data,res) {
+                $('#notification-bar').text('OK: ' + res );
+                var html = resulttoHtml(data);
+                $('#result').html(html);
+            },
+            error: function(e) {
+                console.log('error:' , e);
+                if(e.status < 200 || e.status >= 400){
+                    // to do cuando falla
+                    $('#result').html(resulttoHtml());
+                    $('#notification-bar').text('An error occurred: ' + e.statusText );
+                }
+            }
+        });
+    }
+
+    function resulttoHtml(result){
+        if(!result){
+            return str = emptyResult();
+        }
+        var str = `<ul class="list-unstyled">`;
+        var length = result.length;
+        for( var i in result){
+ 
+            var li = `<li class="media">
+                <img class="mr-3" src="/assets/img/generic_avatar.png" alt="Generic placeholder image">
+                <div class="media-body">
+                    <p>id: ${result[i].iduser}</p>
+                    <h5 class="mt-0 mb-1">Nombre:</h5>
+                    <p>${result[i].name}</p>
+                    <h5 class="mt-0 mb-1">Propiedades:</h5>
+                    <ul>
+                        ${propertiesHtml( result[i].properties)}
+                    </ul>
+                </div>
+            </li>`;
+            str += li;
+
+        }
+        str += '</ul>';
+        return str;
+
+    }
+    function propertiesHtml(props){
+        var str = ``;
+        for (var prop in props) {
+            str += `<li><strong>${prop}</strong>: ${props[prop]}</li>`;
+            
+        }
+        return str;
+    }
+
+    function emptyResult(){
+        var str = `no result`;
+        return str;
+    }
+</script>
+
+</body>
+
+</html>
